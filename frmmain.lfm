@@ -1,0 +1,124 @@
+object MainForm: TMainForm
+  Left = 381
+  Height = 631
+  Top = 181
+  Width = 1143
+  Caption = 'Magic Cinverter'
+  ClientHeight = 605
+  ClientWidth = 1143
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  LCLVersion = '2.0.6.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 535
+    Top = 0
+    Width = 1143
+    Align = alClient
+    Caption = 'Panel1'
+    ClientHeight = 535
+    ClientWidth = 1143
+    TabOrder = 0
+    object FilesListView: TListView
+      Left = 1
+      Height = 533
+      Top = 1
+      Width = 1141
+      Align = alClient
+      Columns = <      
+        item
+          AutoSize = True
+          Caption = 'FileName'
+          Width = 72
+        end      
+        item
+          Caption = 'File path'
+          Width = 1049
+        end>
+      ReadOnly = True
+      RowSelect = True
+      TabOrder = 0
+      ViewStyle = vsReport
+    end
+  end
+  object StatusBar1: TStatusBar
+    Left = 0
+    Height = 20
+    Top = 585
+    Width = 1143
+    Panels = <>
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 50
+    Top = 535
+    Width = 1143
+    Align = alBottom
+    Caption = 'Panel2'
+    ClientHeight = 50
+    ClientWidth = 1143
+    TabOrder = 2
+    object BitBtn1: TBitBtn
+      Left = 1
+      Height = 48
+      Top = 1
+      Width = 159
+      Align = alLeft
+      Caption = 'Do Convert'
+      TabOrder = 0
+    end
+    object ProgressBar1: TProgressBar
+      Left = 170
+      Height = 28
+      Top = 11
+      Width = 962
+      Align = alClient
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 10
+      BorderSpacing.Right = 10
+      BorderSpacing.Bottom = 10
+      TabOrder = 1
+    end
+  end
+  object MainMenu1: TMainMenu
+    left = 83
+    top = 56
+    object MenuItem1: TMenuItem
+      Caption = 'File'
+      object OpenFileListMenuItem: TMenuItem
+        Caption = 'Open filelist ...'
+        OnClick = OpenFileListMenuItemClick
+      end
+      object SaveFileListAsMenuItem: TMenuItem
+        Caption = 'Save filelist as ...'
+        OnClick = SaveFileListAsMenuItemClick
+      end
+      object AddFilesMenuItem: TMenuItem
+        Caption = 'Add files ...'
+      end
+      object AddFromFolderMenuItem: TMenuItem
+        Caption = 'Add files from folder...'
+        OnClick = AddFromFolderMenuItemClick
+      end
+      object MenuItem4: TMenuItem
+        Caption = '-'
+      end
+      object ExitMenuItem: TMenuItem
+        Caption = 'Exit'
+        OnClick = ExitMenuItemClick
+      end
+    end
+    object MenuItem2: TMenuItem
+      Caption = 'Application'
+      object SettingsMenuItem: TMenuItem
+        Caption = 'Settings...'
+      end
+    end
+    object MenuItem3: TMenuItem
+      Caption = 'Help'
+      object AboutMenuItem: TMenuItem
+        Caption = 'About'
+      end
+    end
+  end
+end

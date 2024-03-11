@@ -1,0 +1,8 @@
+object ConvertModeForm: TConvertModeForm
+  Left = 943
+  Height = 240
+  Top = 367
+  Width = 320
+  Caption = 'ConvertModeForm'
+  LCLVersion = '2.0.6.0'
+end

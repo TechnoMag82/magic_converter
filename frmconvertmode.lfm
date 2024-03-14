@@ -1,8 +1,239 @@
 object ConvertModeForm: TConvertModeForm
-  Left = 943
-  Height = 240
-  Top = 367
-  Width = 320
-  Caption = 'ConvertModeForm'
+  Left = 569
+  Height = 311
+  Top = 283
+  Width = 653
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Настройка конвертирования'
+  ClientHeight = 311
+  ClientWidth = 653
+  DefaultMonitor = dmMainForm
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  Position = poMainFormCenter
+  ShowInTaskBar = stNever
   LCLVersion = '2.0.6.0'
+  object GroupBox1: TGroupBox
+    Left = 16
+    Height = 137
+    Top = 8
+    Width = 624
+    Caption = 'Конвертировать в'
+    ClientHeight = 117
+    ClientWidth = 620
+    TabOrder = 0
+    object ConvertToComboBox: TComboBox
+      Left = 8
+      Height = 28
+      Top = 8
+      Width = 232
+      ItemHeight = 0
+      ItemIndex = 0
+      Items.Strings = (
+        'JPEG images (.jpg)'
+        'PNG images (.png)'
+        'BMP images (.bmp)'
+        'GIF images (.gif)'
+        'XPM image (.xpm)'
+      )
+      OnSelect = ConvertToComboBoxSelect
+      ParentShowHint = False
+      Style = csDropDownList
+      TabOrder = 0
+      Text = 'JPEG images (.jpg)'
+    end
+    object RadioGroup1: TRadioGroup
+      Left = 8
+      Height = 62
+      Top = 43
+      Width = 232
+      AutoFill = True
+      Caption = 'Bits per pixel'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclTopToBottomThenLeftToRight
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 42
+      ClientWidth = 228
+      ColumnLayout = clVerticalThenHorizontal
+      TabOrder = 1
+      object BitsRadioButton8: TRadioButton
+        Left = 6
+        Height = 42
+        Top = 0
+        Width = 48
+        Caption = '8'
+        Checked = True
+        OnClick = BitsRadioButton8Change
+        TabOrder = 0
+        TabStop = True
+      end
+      object BitsRadioButton16: TRadioButton
+        Left = 54
+        Height = 42
+        Top = 0
+        Width = 56
+        Caption = '16'
+        OnClick = BitsRadioButton8Change
+        TabOrder = 1
+      end
+      object BitsRadioButton24: TRadioButton
+        Left = 110
+        Height = 42
+        Top = 0
+        Width = 56
+        Caption = '24'
+        OnClick = BitsRadioButton8Change
+        TabOrder = 2
+      end
+      object BitsRadioButton32: TRadioButton
+        Left = 166
+        Height = 42
+        Top = 0
+        Width = 56
+        Caption = '32'
+        OnClick = BitsRadioButton8Change
+        TabOrder = 3
+      end
+    end
+    object CompressGroupBox: TGroupBox
+      Left = 248
+      Height = 105
+      Top = 0
+      Width = 177
+      Caption = 'Сжатие JPEG/PNG'
+      ClientHeight = 85
+      ClientWidth = 173
+      TabOrder = 2
+      object CompressSpinEdit: TSpinEdit
+        Left = 8
+        Height = 26
+        Top = 8
+        Width = 58
+        OnChange = CompressSpinEditChange
+        TabOrder = 0
+      end
+      object Label1: TLabel
+        Left = 72
+        Height = 16
+        Top = 14
+        Width = 13
+        Caption = '%'
+        ParentColor = False
+      end
+      object CompressTrackBar: TTrackBar
+        Left = 8
+        Height = 39
+        Top = 40
+        Width = 156
+        Max = 100
+        OnChange = CompressTrackBarChange
+        Position = 0
+        TickStyle = tsNone
+        TabOrder = 1
+      end
+    end
+    object ChangeSizeCheckBox: TCheckBox
+      Left = 442
+      Height = 22
+      Top = 8
+      Width = 161
+      Caption = 'Изменение размера'
+      TabOrder = 3
+    end
+    object Label2: TLabel
+      Left = 442
+      Height = 16
+      Top = 36
+      Width = 57
+      Caption = 'Ширина:'
+      ParentColor = False
+    end
+    object Label3: TLabel
+      Left = 442
+      Height = 16
+      Top = 80
+      Width = 54
+      Caption = 'Высота:'
+      ParentColor = False
+    end
+    object WidthSpinEdit: TSpinEdit
+      Left = 512
+      Height = 26
+      Top = 32
+      Width = 91
+      TabOrder = 4
+    end
+    object HeightSpinEdit: TSpinEdit
+      Left = 512
+      Height = 26
+      Top = 79
+      Width = 91
+      TabOrder = 5
+    end
+  end
+  object GroupBox3: TGroupBox
+    Left = 16
+    Height = 105
+    Top = 152
+    Width = 625
+    Caption = 'Имя фалы и пути'
+    ClientHeight = 85
+    ClientWidth = 621
+    TabOrder = 1
+    object Label4: TLabel
+      Left = 9
+      Height = 16
+      Top = 13
+      Width = 149
+      Caption = 'Путь для сохранения:'
+      ParentColor = False
+    end
+    object PathToSaveEdit: TEdit
+      Left = 168
+      Height = 26
+      Top = 8
+      Width = 384
+      ReadOnly = True
+      TabOrder = 0
+    end
+    object SelectPathToSaveButton: TButton
+      Left = 560
+      Height = 25
+      Top = 8
+      Width = 46
+      Caption = '...'
+      OnClick = SelectPathToSaveButtonClick
+      TabOrder = 1
+    end
+    object Label5: TLabel
+      Left = 8
+      Height = 16
+      Top = 52
+      Width = 116
+      Caption = 'Суффикс файла:'
+      ParentColor = False
+    end
+    object FileNameSuffixEdit: TEdit
+      Left = 168
+      Height = 26
+      Top = 48
+      Width = 384
+      TabOrder = 2
+      Text = '_converted'
+    end
+  end
+  object StartConvertButton: TButton
+    Left = 464
+    Height = 25
+    Top = 272
+    Width = 176
+    Caption = 'Конвертировать'
+    OnClick = StartConvertButtonClick
+    TabOrder = 2
+  end
 end

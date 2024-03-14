@@ -6,45 +6,56 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ExtCtrls,
-  ComCtrls, Buttons, fileutil, LCLType;
+  ComCtrls, Buttons, fileutil, LCLType, ExtDlgs, ActnList,
+  frmConvertMode;
 
 type
 
   { TMainForm }
 
   TMainForm = class(TForm)
-    BitBtn1: TBitBtn;
-    FilesListView: TListView;
-    MainMenu1: TMainMenu;
-    //MenuItem1: TMenuItem;
-    //MenuItem2: TMenuItem;
-    ExitMenuItem: TMenuItem;
-    //MenuItem1: TMenuItem;
-    //MenuItem2: TMenuItem;
-    //MenuItem3: TMenuItem;
     AboutMenuItem: TMenuItem;
-    //MenuItem1: TMenuItem;
-    //MenuItem2: TMenuItem;
-    //MenuItem3: TMenuItem;
+    ConvertAction: TAction;
     AddFilesMenuItem: TMenuItem;
     AddFromFolderMenuItem: TMenuItem;
-    //MenuItem4: TMenuItem;
-    SaveFileListAsMenuItem: TMenuItem;
     OpenFileListMenuItem: TMenuItem;
-    //Panel1: TPanel;
+    SaveFileListAsMenuItem: TMenuItem;
+    SaveListAsAction: TAction;
+    OpenFileListAction: TAction;
+    AddFromFolderAction: TAction;
+    AddFilesAction: TAction;
+    ActionList1: TActionList;
+    FilesListView: TListView;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    ToolbarImageList: TImageList;
+    MainMenu1: TMainMenu;
+    ExitMenuItem: TMenuItem;
+    Panel1: TPanel;
     Panel2: TPanel;
     ProgressBar1: TProgressBar;
     SettingsMenuItem: TMenuItem;
     StatusBar1: TStatusBar;
-    procedure AddFromFolderMenuItemClick(Sender: TObject);
+    MainToolBar: TToolBar;
+    AddFilesToolButton: TToolButton;
+    AddFromFolderToolButton: TToolButton;
+    SaveListToolButton: TToolButton;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    procedure AddFilesActionExecute(Sender: TObject);
+    procedure AddFromFolderActionExecute(Sender: TObject);
+    procedure ConvertActionExecute(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure OpenFileListMenuItemClick(Sender: TObject);
-    procedure SaveFileListAsMenuItemClick(Sender: TObject);
+    procedure OpenFileListActionExecute(Sender: TObject);
+    procedure SaveListAsActionExecute(Sender: TObject);
   private
-    Panel1: TPanel;
     procedure loadFromFolder(path: String);
     procedure addFileToList(filePath: String);
+    procedure enableActions(enable: Boolean);
+    function isListEmpty(): Boolean;
   public
 
   end;
@@ -63,7 +74,31 @@ begin
   Close;
 end;
 
-procedure TMainForm.AddFromFolderMenuItemClick(Sender: TObject);
+procedure TMainForm.AddFilesActionExecute(Sender: TObject);
+var
+  openFilesDialog: TOpenPictureDialog;
+  filePath: String;
+begin
+  openFilesDialog := TOpenPictureDialog.Create(self);
+  openFilesDialog.Title := 'Select images to add';
+  openFilesDialog.Filter := 'All files|*.*|JPEG images|*.jpg|PNG images|*.png';
+  openFilesDialog.FilterIndex := 0;
+  openFilesDialog.Options := [ofAllowMultiSelect, ofReadOnly, ofFileMustExist, ofNoNetworkButton];
+  try
+    if openFilesDialog.Execute then
+    begin
+      for filePath in openFilesDialog.Files do
+      begin
+        addFileToList(filePath);
+      end;
+      StatusBar1.SimpleText := 'Итого: ' + IntToStr(FilesListView.Items.Count);
+    end;
+  finally
+    openFilesDialog.Free;
+  end;
+end;
+
+procedure TMainForm.AddFromFolderActionExecute(Sender: TObject);
 var
   selectFolderDialog: TSelectDirectoryDialog;
 begin
@@ -71,18 +106,44 @@ begin
   selectFolderDialog.Title := 'Select folder with images';
   try
     if selectFolderDialog.Execute then
+    begin
       loadFromFolder(selectFolderDialog.FileName);
+      StatusBar1.SimpleText := 'Итого: ' + IntToStr(FilesListView.Items.Count);
+    end;
   finally
     selectFolderDialog.Free;
+  end;
+end;
+
+procedure TMainForm.ConvertActionExecute(Sender: TObject);
+begin
+  if isListEmpty() then
+    exit;
+  with TConvertModeForm.Create(self) do
+  begin
+    try
+      ShowModal;
+      if ModalResult = mrOk then
+      begin
+         getCmdLine();
+      end;
+    finally
+      Free;
+    end;
   end;
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   Caption := Application.Title;
+  AddFilesAction.Hint := AddFilesAction.Caption;
+  AddFromFolderAction.Hint := AddFromFolderAction.Caption;
+  OpenFileListAction.Hint := OpenFileListAction.Caption;
+  SaveListAsAction.Hint := SaveListAsAction.Caption;
+  ConvertAction.Hint := ConvertAction.Caption;
 end;
 
-procedure TMainForm.OpenFileListMenuItemClick(Sender: TObject);
+procedure TMainForm.OpenFileListActionExecute(Sender: TObject);
 var
   openFileDialog: TOpenDialog;
   files: TStringList;
@@ -90,33 +151,34 @@ var
 begin
   openFileDialog := TOpenDialog.Create(self);
   try
-    if openFileDialog.execute then
+    if openFileDialog.Execute then
     begin
       FilesListView.Clear;
       files := TStringList.Create;
-      files.LoadFromFile(openFileDialog.FileName);
-      for filePath in files do
-      begin
-        addFileToList(filePath);
+      try
+        files.LoadFromFile(openFileDialog.FileName);
+        for filePath in files do
+        begin
+          addFileToList(filePath);
+        end;
+        StatusBar1.SimpleText := 'Итого: ' + IntToStr(FilesListView.Items.Count);
+      finally
+        files.Free;
       end;
     end;
   finally
-    files.Free;
     openFileDialog.Free;
   end;
 end;
 
-procedure TMainForm.SaveFileListAsMenuItemClick(Sender: TObject);
+procedure TMainForm.SaveListAsActionExecute(Sender: TObject);
 var
   saveFileDialog: TSaveDialog;
   files: TStringList;
   i: Integer;
 begin
-  if (FilesListView.Items.Count = 0) then
-  begin
-    Application.MessageBox('List is empty.', 'Error', MB_OK + MB_ICONWARNING);
+  if isListEmpty() then
     exit;
-  end;
   saveFileDialog := TSaveDialog.Create(self);
   saveFileDialog.Title := 'Select file for save';
   try
@@ -147,6 +209,7 @@ begin
     begin
       addFileToList(filePath);
     end;
+    StatusBar1.SimpleText := 'Итого: ' + IntToStr(FilesListView.Items.Count);
   finally
     files.Free;
   end;
@@ -161,6 +224,20 @@ begin
   listItem.SubItems.Add(filePath);
 end;
 
+procedure TMainForm.enableActions(enable: Boolean);
+begin
+
+end;
+
+function TMainForm.isListEmpty() : Boolean;
+begin
+  if (FilesListView.Items.Count = 0) then
+  begin
+    Application.MessageBox('List is empty.', 'Error', MB_OK + MB_ICONWARNING);
+    Result := True;
+  end else
+    Result := false;
+end;
 
 end.
 

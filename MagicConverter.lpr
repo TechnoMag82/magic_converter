@@ -16,7 +16,7 @@ begin
   RequireDerivedFormResource := True;
   Application.Scaled := True;
   Application.Initialize;
-  Application.Title := 'MagicConverter';
+  Application.Title := 'Magic Converter v1.0';
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

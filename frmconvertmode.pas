@@ -13,6 +13,7 @@ type
   { TConvertModeForm }
 
   TConvertModeForm = class(TForm)
+    BitsRadioButtonNone: TRadioButton;
     SelectPathToSaveButton: TButton;
     StartConvertButton: TButton;
     ChangeSizeCheckBox: TCheckBox;
@@ -37,20 +38,21 @@ type
     HeightSpinEdit: TSpinEdit;
     CompressTrackBar: TTrackBar;
     procedure BitsRadioButton8Change(Sender: TObject);
+    procedure ChangeSizeCheckBoxChange(Sender: TObject);
     procedure CompressTrackBarChange(Sender: TObject);
     procedure CompressSpinEditChange(Sender: TObject);
     procedure ConvertToComboBoxSelect(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure HeightSpinEditChange(Sender: TObject);
     procedure SelectPathToSaveButtonClick(Sender: TObject);
     procedure StartConvertButtonClick(Sender: TObject);
-    function getCmdLine(): String;
+    procedure WidthSpinEditChange(Sender: TObject);
   private
     FCmdLineBuilder: TCmdLineBuilder;
     procedure initDefaults();
     function validateForm(): Boolean;
   public
-
+    constructor Create(AOwner: TComponent; var ACmdLineBuilder: TCmdLineBuilder); overload;
   end;
 
 //var
@@ -64,7 +66,7 @@ implementation
 
 procedure TConvertModeForm.FormCreate(Sender: TObject);
 begin
-  FCmdLineBuilder := TCmdLineBuilder.Create;
+  initDefaults();
 end;
 
 procedure TConvertModeForm.ConvertToComboBoxSelect(Sender: TObject);
@@ -73,29 +75,45 @@ begin
   begin
     FCmdLineBuilder.setTargetFormat( Items[ItemIndex] );
     CompressGroupBox.Enabled := (ItemIndex = 0) or (ItemIndex = 1);
+    if (CompressGroupBox.Enabled) then
+      FCmdLineBuilder.setCompressQuality(CompressSpinEdit.Value)
+    else
+      FCmdLineBuilder.setCompressQuality(-1);
   end;
 end;
 
 procedure TConvertModeForm.BitsRadioButton8Change(Sender: TObject);
 begin
-  FCmdLineBuilder.setBitsPerPixel((Sender As TRadioButton).Caption);
+  try
+    FCmdLineBuilder.setBitsPerPixel(StrToInt((Sender As TRadioButton).Caption));
+  except
+    FCmdLineBuilder.setBitsPerPixel(-1);
+  end;
+end;
+
+procedure TConvertModeForm.ChangeSizeCheckBoxChange(Sender: TObject);
+begin
+  if (ChangeSizeCheckBox.Checked) then
+    FCmdLineBuilder.setResize(WidthSpinEdit.Value, HeightSpinEdit.Value)
+  else
+    FCmdLineBuilder.setResize(-1, -1);
 end;
 
 procedure TConvertModeForm.CompressTrackBarChange(Sender: TObject);
 begin
   CompressSpinEdit.Value := CompressTrackBar.Position;
-  FCmdLineBuilder.setCompressQuality(IntToStr(CompressSpinEdit.Value));
+  FCmdLineBuilder.setCompressQuality(CompressSpinEdit.Value);
 end;
 
 procedure TConvertModeForm.CompressSpinEditChange(Sender: TObject);
 begin
   CompressTrackBar.Position := CompressSpinEdit.Value;
-  FCmdLineBuilder.setCompressQuality(IntToStr(CompressSpinEdit.Value));
+  FCmdLineBuilder.setCompressQuality(CompressSpinEdit.Value);
 end;
 
-procedure TConvertModeForm.FormDestroy(Sender: TObject);
+procedure TConvertModeForm.HeightSpinEditChange(Sender: TObject);
 begin
-  FCmdLineBuilder.Free;
+  FCmdLineBuilder.setResize(WidthSpinEdit.Value, HeightSpinEdit.Value);
 end;
 
 procedure TConvertModeForm.SelectPathToSaveButtonClick(Sender: TObject);
@@ -104,7 +122,10 @@ begin
   begin
     try
       if (execute) then
+      begin
         PathToSaveEdit.Text := FileName;
+        FCmdLineBuilder.setPath(FileName);
+      end;
     finally
       Free;
     end;
@@ -114,22 +135,22 @@ end;
 procedure TConvertModeForm.StartConvertButtonClick(Sender: TObject);
 begin
   if validateForm() then
+  begin
+    FCmdLineBuilder.setFileSuffix(FileNameSuffixEdit.Text);
     ModalResult := mrOk;
+  end;
 end;
 
-function TConvertModeForm.getCmdLine(): String;
+procedure TConvertModeForm.WidthSpinEditChange(Sender: TObject);
 begin
-  Result := FCmdLineBuilder.Build();
+  FCmdLineBuilder.setResize(WidthSpinEdit.Value, HeightSpinEdit.Value);
 end;
 
 procedure TConvertModeForm.initDefaults();
 begin
-  FCmdLineBuilder.setBitsPerPixel(BitsRadioButton8.Caption);
-  with ConvertToComboBox do
-  begin
-    FCmdLineBuilder.setTargetFormat( Items[ItemIndex] );
-    CompressGroupBox.Enabled := (ItemIndex = 0) or (ItemIndex = 1);
-  end;
+  FCmdLineBuilder.setBitsPerPixel(-1);
+  ConvertToComboBoxSelect(ConvertToComboBox);
+  ChangeSizeCheckBoxChange(ChangeSizeCheckBox);
 end;
 
 function TConvertModeForm.validateForm(): Boolean;
@@ -151,6 +172,13 @@ begin
     exit;
   end;
   Result := true;
+end;
+
+constructor TConvertModeForm.Create(AOwner: TComponent;
+  var ACmdLineBuilder: TCmdLineBuilder);
+begin
+  FCmdLineBuilder := ACmdLineBuilder;
+  inherited Create(AOwner);
 end;
 
 end.

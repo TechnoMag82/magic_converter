@@ -10,7 +10,6 @@ object ConvertModeForm: TConvertModeForm
   ClientWidth = 653
   DefaultMonitor = dmMainForm
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '2.0.6.0'
@@ -65,39 +64,47 @@ object ConvertModeForm: TConvertModeForm
         Left = 6
         Height = 42
         Top = 0
-        Width = 48
+        Width = 31
         Caption = '8'
-        Checked = True
         OnClick = BitsRadioButton8Change
         TabOrder = 0
-        TabStop = True
       end
       object BitsRadioButton16: TRadioButton
-        Left = 54
+        Left = 37
         Height = 42
         Top = 0
-        Width = 56
+        Width = 39
         Caption = '16'
         OnClick = BitsRadioButton8Change
         TabOrder = 1
       end
       object BitsRadioButton24: TRadioButton
-        Left = 110
+        Left = 76
         Height = 42
         Top = 0
-        Width = 56
+        Width = 39
         Caption = '24'
         OnClick = BitsRadioButton8Change
         TabOrder = 2
       end
       object BitsRadioButton32: TRadioButton
-        Left = 166
+        Left = 115
         Height = 42
         Top = 0
-        Width = 56
+        Width = 39
         Caption = '32'
         OnClick = BitsRadioButton8Change
         TabOrder = 3
+      end
+      object BitsRadioButtonNone: TRadioButton
+        Left = 154
+        Height = 42
+        Top = 0
+        Width = 68
+        Caption = 'Default'
+        Checked = True
+        TabOrder = 4
+        TabStop = True
       end
     end
     object CompressGroupBox: TGroupBox
@@ -114,8 +121,10 @@ object ConvertModeForm: TConvertModeForm
         Height = 26
         Top = 8
         Width = 58
+        MinValue = 30
         OnChange = CompressSpinEditChange
         TabOrder = 0
+        Value = 30
       end
       object Label1: TLabel
         Left = 72
@@ -131,8 +140,9 @@ object ConvertModeForm: TConvertModeForm
         Top = 40
         Width = 156
         Max = 100
+        Min = 30
         OnChange = CompressTrackBarChange
-        Position = 0
+        Position = 30
         TickStyle = tsNone
         TabOrder = 1
       end
@@ -143,6 +153,7 @@ object ConvertModeForm: TConvertModeForm
       Top = 8
       Width = 161
       Caption = 'Изменение размера'
+      OnChange = ChangeSizeCheckBoxChange
       TabOrder = 3
     end
     object Label2: TLabel
@@ -166,6 +177,7 @@ object ConvertModeForm: TConvertModeForm
       Height = 26
       Top = 32
       Width = 91
+      OnChange = WidthSpinEditChange
       TabOrder = 4
     end
     object HeightSpinEdit: TSpinEdit
@@ -173,6 +185,7 @@ object ConvertModeForm: TConvertModeForm
       Height = 26
       Top = 79
       Width = 91
+      OnChange = HeightSpinEditChange
       TabOrder = 5
     end
   end

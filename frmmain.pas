@@ -7,7 +7,9 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ExtCtrls,
   ComCtrls, Buttons, fileutil, LCLType, ExtDlgs, ActnList,
-  frmConvertMode;
+  frmConvertMode,
+  frmConvert,
+  uCmdLineBuilder;
 
 type
 
@@ -34,8 +36,6 @@ type
     MainMenu1: TMainMenu;
     ExitMenuItem: TMenuItem;
     Panel1: TPanel;
-    Panel2: TPanel;
-    ProgressBar1: TProgressBar;
     SettingsMenuItem: TMenuItem;
     StatusBar1: TStatusBar;
     MainToolBar: TToolBar;
@@ -49,12 +49,16 @@ type
     procedure ConvertActionExecute(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure OpenFileListActionExecute(Sender: TObject);
     procedure SaveListAsActionExecute(Sender: TObject);
   private
+    FCmdLineBuilder: TCmdLineBuilder;
+    FFilesToConvert: TStringList;
     procedure loadFromFolder(path: String);
     procedure addFileToList(filePath: String);
-    procedure enableActions(enable: Boolean);
+    procedure rebuildFilesList();
+    procedure startConvertForm();
     function isListEmpty(): Boolean;
   public
 
@@ -119,13 +123,14 @@ procedure TMainForm.ConvertActionExecute(Sender: TObject);
 begin
   if isListEmpty() then
     exit;
-  with TConvertModeForm.Create(self) do
+  with TConvertModeForm.Create(self, FCmdLineBuilder) do
   begin
     try
       ShowModal;
       if ModalResult = mrOk then
       begin
-         getCmdLine();
+        rebuildFilesList;
+        startConvertForm;
       end;
     finally
       Free;
@@ -135,12 +140,20 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  FCmdLineBuilder := TCmdLineBuilder.Create;
+  FFilesToConvert := TStringList.Create;
   Caption := Application.Title;
   AddFilesAction.Hint := AddFilesAction.Caption;
   AddFromFolderAction.Hint := AddFromFolderAction.Caption;
   OpenFileListAction.Hint := OpenFileListAction.Caption;
   SaveListAsAction.Hint := SaveListAsAction.Caption;
   ConvertAction.Hint := ConvertAction.Caption;
+end;
+
+procedure TMainForm.FormDestroy(Sender: TObject);
+begin
+  FCmdLineBuilder.Free;
+  FFilesToConvert.Free;
 end;
 
 procedure TMainForm.OpenFileListActionExecute(Sender: TObject);
@@ -150,6 +163,8 @@ var
   filePath: String;
 begin
   openFileDialog := TOpenDialog.Create(self);
+  openFileDialog.Filter := 'Text files|*.txt';
+  openFileDialog.FilterIndex := 0;
   try
     if openFileDialog.Execute then
     begin
@@ -224,9 +239,41 @@ begin
   listItem.SubItems.Add(filePath);
 end;
 
-procedure TMainForm.enableActions(enable: Boolean);
+procedure TMainForm.rebuildFilesList();
+var
+  listItem: TListItem;
 begin
+  FFilesToConvert.Clear;
+  for listItem in FilesListView.Items do
+  begin
+     FFilesToConvert.add(listItem.SubItems[0]);
+  end;
+end;
 
+procedure TMainForm.startConvertForm();
+var
+  convertForm: TConvertForm;
+begin
+  convertForm := TConvertForm.Create(self, FCmdLineBuilder, FFilesToConvert);
+  try
+    convertForm.ShowModal;
+    if (convertForm.ModalResult = mrOk) then
+    begin
+      if (Application.MessageBox('Conversion is completely completed. Do you want to start new convert&',
+        'Convert', MB_YESNO + MB_ICONINFORMATION) = IDYES) then
+        begin
+          FilesListView.Clear;
+          FFilesToConvert.Clear;
+          StatusBar1.SimpleText := '';
+        end;
+    end else if (convertForm.ModalResult = mrCancel) then
+    begin
+      Application.MessageBox('Conversion is aborted!',
+        'Convert', MB_OK + MB_ICONEXCLAMATION);
+    end;
+  finally
+    convertForm.Free;
+  end;
 end;
 
 function TMainForm.isListEmpty() : Boolean;

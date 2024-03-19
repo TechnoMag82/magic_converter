@@ -3,11 +3,11 @@ program MagicConverter;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}{$ENDIF}
+  {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, frmMain, frmConvertMode
+  Forms, frmMain
   { you can add units after this };
 
 {$R *.res}
@@ -16,7 +16,7 @@ begin
   RequireDerivedFormResource := True;
   Application.Scaled := True;
   Application.Initialize;
-  Application.Title := 'Magic Converter v1.0';
+  Application.Title := 'MagicConverter v1.0';
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.

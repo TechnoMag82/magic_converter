@@ -1,0 +1,33 @@
+object ConvertForm: TConvertForm
+  Left = 375
+  Height = 89
+  Top = 172
+  Width = 320
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'Converting'
+  ClientHeight = 89
+  ClientWidth = 320
+  OnClose = FormClose
+  OnCreate = FormCreate
+  Position = poMainFormCenter
+  ShowInTaskBar = stNever
+  LCLVersion = '2.0.6.0'
+  object ProgressBar1: TProgressBar
+    Left = 16
+    Height = 20
+    Top = 48
+    Width = 288
+    Max = 0
+    Step = 1
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 128
+    Height = 16
+    Top = 16
+    Width = 43
+    Caption = 'Label1'
+    ParentColor = False
+  end
+end

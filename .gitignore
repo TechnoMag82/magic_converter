@@ -1,0 +1,7 @@
+lib
+lib/*
+backup
+backup/*
+MagicConverter
+MagicConverter.dbg
+debug.log

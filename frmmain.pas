@@ -9,6 +9,7 @@ uses
   ComCtrls, Buttons, fileutil, LCLType, ExtDlgs, ActnList,
   frmConvertMode,
   frmConvert,
+  frmAbout,
   uCmdLineBuilder;
 
 type
@@ -17,6 +18,7 @@ type
 
   TMainForm = class(TForm)
     AboutMenuItem: TMenuItem;
+    ClearListAction: TAction;
     ConvertAction: TAction;
     AddFilesMenuItem: TMenuItem;
     AddFromFolderMenuItem: TMenuItem;
@@ -44,8 +46,12 @@ type
     SaveListToolButton: TToolButton;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    procedure AboutMenuItemClick(Sender: TObject);
     procedure AddFilesActionExecute(Sender: TObject);
     procedure AddFromFolderActionExecute(Sender: TObject);
+    procedure ClearListActionExecute(Sender: TObject);
     procedure ConvertActionExecute(Sender: TObject);
     procedure ExitMenuItemClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -59,6 +65,7 @@ type
     procedure addFileToList(filePath: String);
     procedure rebuildFilesList();
     procedure startConvertForm();
+    procedure clearList();
     function isListEmpty(): Boolean;
   public
 
@@ -102,6 +109,11 @@ begin
   end;
 end;
 
+procedure TMainForm.AboutMenuItemClick(Sender: TObject);
+begin
+  TAboutForm.Create(self).ShowModal;
+end;
+
 procedure TMainForm.AddFromFolderActionExecute(Sender: TObject);
 var
   selectFolderDialog: TSelectDirectoryDialog;
@@ -117,6 +129,13 @@ begin
   finally
     selectFolderDialog.Free;
   end;
+end;
+
+procedure TMainForm.ClearListActionExecute(Sender: TObject);
+begin
+  if (Application.MessageBox('Do you want to clear list and start new convert?',
+        'Convert', MB_YESNO + MB_ICONQUESTION) = IDYES) then
+    clearList();
 end;
 
 procedure TMainForm.ConvertActionExecute(Sender: TObject);
@@ -148,6 +167,7 @@ begin
   OpenFileListAction.Hint := OpenFileListAction.Caption;
   SaveListAsAction.Hint := SaveListAsAction.Caption;
   ConvertAction.Hint := ConvertAction.Caption;
+  ClearListAction.Hint := ClearListAction.Caption;
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -259,12 +279,10 @@ begin
     convertForm.ShowModal;
     if (convertForm.ModalResult = mrOk) then
     begin
-      if (Application.MessageBox('Conversion is completely completed. Do you want to start new convert&',
+      if (Application.MessageBox('Conversion is completely completed. Do you want to start new convert?',
         'Convert', MB_YESNO + MB_ICONINFORMATION) = IDYES) then
         begin
-          FilesListView.Clear;
-          FFilesToConvert.Clear;
-          StatusBar1.SimpleText := '';
+          clearList();
         end;
     end else if (convertForm.ModalResult = mrCancel) then
     begin
@@ -274,6 +292,13 @@ begin
   finally
     convertForm.Free;
   end;
+end;
+
+procedure TMainForm.clearList();
+begin
+  FilesListView.Clear;
+  FFilesToConvert.Clear;
+  StatusBar1.SimpleText := '';
 end;
 
 function TMainForm.isListEmpty() : Boolean;

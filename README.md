@@ -4,6 +4,9 @@
         
 MagicConverter - front-end for command 'convert' from **ImageMagick** toolkit.
 
+![MainWindow](screenshots/screenshot1.png)
+
+
 Short List of MagicConverter functions:
 
  - packet convert images from/to formats BMP, JPG, GIF, PNG, XMP
